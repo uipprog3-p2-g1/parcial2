@@ -1,0 +1,29 @@
+<MainScreen>:
+    GridLayout:
+        cols: 2
+        size_hint: .8, .1
+        pos_hint: {'x': .10, 'y': .55}
+        TextInput:
+            id: origin
+            text:'Origen'
+            size_hint: .2, .1
+            height: .1
+            valign: 'middle'
+        TextInput:
+            id: destination
+            text:'Destino'
+            size_hint: .2, .1
+            height: .1
+            valign: 'middle'
+    GridLayout:
+        cols:1
+        size_hint: .8, .2
+        pos_hint: {'x': .10, 'y': .35}
+        Button:
+            id: search
+            text: 'Calcular tarifa'
+            size_hint: .2, .1
+            height: 44
+            valign: 'middle'
+            on_release: root.ubicacion(origin.text,destination.text)
+            #on_release: root.query(origin.text,destination.text)
