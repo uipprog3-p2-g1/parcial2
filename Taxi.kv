@@ -1,5 +1,10 @@
 <MainScreen>:
-    GridLayout:
+    BoxLayout:
+		orientation: "vertical"
+		Video:
+			source: "Bienvenidos a TaxiApp.mp4"
+			state:'play'
+	GridLayout:
         canvas:
             #Color:
                 #rgb: (0.93, 0.93, 0.93)
@@ -11,7 +16,7 @@
         size_hint: 1, .25
         pos_hint: {'x':0, 'y': .75}
         #top: root.top
-
+	
     GridLayout:
         cols: 2
         size_hint: 1, .1
@@ -79,3 +84,4 @@
             #halign:'left'
             color: 0,0,0,1
             text:'Calculos basados en tarifas ofrecidas por la ATTT.'
+	
