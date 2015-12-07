@@ -1,76 +1,48 @@
 from kivy.app import App
 from kivy.uix.floatlayout import FloatLayout
-import sqlite3 as lite
-import sys
+from kivy.uix.popup import Popup
+from kivy.uix.gridlayout import GridLayout
+from kivy.uix.label import Label
+from kivy.uix.textinput import TextInput
+from kivy.core.window import Window
+import sqlcon as dbcon
+
+Window.size = (400, 500)
 
 
 class MainScreen(FloatLayout):
+
     def __init__(self, **kwargs):
         super(MainScreen, self).__init__(**kwargs)
-        self.strOrigen=''
-        self.strDestino=''
 
-    def ubicacion(self,origen,destino):
-        print(str(origen + destino))
-        self.strOrigen = origen
-        self.strDestino = destino
-        con = lite.connect('db/DBt.db')
+    def showTarifa(self, origen, destino):
 
-        with con:
-            cur = con.cursor()
-            cur.execute("SELECT SECTOR,SUBSECTOR FROM tUbicaciones where UBICACION=:UBICACION",
-                        {"UBICACION": str(self.strOrigen)})
+        try:
+            self.db = dbcon.Conexion(origen,destino)
+            self.db.ubicacion()
+            sOrigen = self.db.pSectorO
+            sDestino= self.db.pSectorD
+            self.db.tarifa()
+            sTarifa = self.db.strTarifa
+            #print(sTarifa)
+            self.box = GridLayout(cols=1)
+            self.box.add_widget(Label(text='Desde: '+origen+ '\nHasta: '+destino))
+            self.box.add_widget(Label(text=str(sTarifa)))
 
-            rows = cur.fetchone()
-            pSectorO = rows[0]
-            pSubsectorO = rows[1]
-            print(str(pSectorO))
+            self.popup = Popup(title='Tarifa aproximada', content=self.box, size_hint=(None, None), size=(200, 200))
+            self.popup.open()
+        except Exception:
+            self.box = GridLayout(cols=1)
+            self.box.add_widget(Label(text='Datos incorrectos, favor \n'
+                                           'verificar origen y destino'))
 
-        with con:
-            cur = con.cursor()
-            cur.execute("SELECT SECTOR,SUBSECTOR FROM tUbicaciones where UBICACION=:UBICACION",
-                        {"UBICACION": str(self.strDestino)})
-
-            rows = cur.fetchone()
-            pSectorD = rows[0]
-            pSubsectorD = rows[1]
-            print(str(pSectorD))
-
-
-        self.tarifa(pSectorO,pSectorD,pSubsectorO)
-
-    def tarifa(self,sectorO,sectorD,subsectorO):
-        self.strsectorO = sectorO
-        self.strsectorD = sectorD
-        self.strsubsectorO = subsectorO
-        #self.strSector = str(self.tmp_a1)
-        #print(str(self.strArea))
-        con = lite.connect('db/DBt.db')
-
-        if self.strsubsectorO =='N':
-            with con:
-                cur = con.cursor()
-                cur.execute("SELECT Tarifa FROM tAreaNorte where sOrigen=:sOrigen and sDestino=:sDestino",
-                            {"sOrigen": str(self.strsectorO), "sDestino": str(self.strsectorD)})
-
-                rows = cur.fetchall()
-                for row in rows:
-                        print(row)
-
-        if self.strsubsectorO =='S':
-            with con:
-                cur = con.cursor()
-                cur.execute("SELECT Tarifa FROM tAreaSur where sOrigen=:sOrigen and sDestino=:sDestino",
-                            {"sOrigen": str(self.strsectorO), "sDestino": str(self.strsectorD)})
-
-                rows = cur.fetchall()
-                for row in rows:
-                        print(row)
+            self.popup = Popup(title='Tarifa', content=self.box, size_hint=(None, None), size=(250, 200))
+            self.popup.open()
 
 class TaxiApp(App):
     def build(self):
-
         return MainScreen()
+
 
 if __name__ == '__main__':
     TaxiApp().run()
